@@ -1,4 +1,4 @@
-package Converters;
+package Converter;
 
 import com.itextpdf.io.font.FontProgramFactory;
 import com.itextpdf.io.font.constants.StandardFonts;

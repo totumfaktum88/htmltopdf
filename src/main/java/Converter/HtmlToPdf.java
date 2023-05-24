@@ -1,4 +1,4 @@
-package Converters;
+package Converter;
 
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
@@ -17,7 +17,6 @@ import com.itextpdf.styledxmlparser.css.media.MediaDeviceDescription;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.Files;
 
 public class HtmlToPdf {
@@ -106,7 +105,7 @@ public class HtmlToPdf {
 
                 (new Watermark(
                         signerDoc,
-                        "Minta tartalom"
+                        watermark
                 )).manipulatePdf();
 
                 signerDoc.close();
@@ -117,7 +116,6 @@ public class HtmlToPdf {
             }
         } else {
             throw new FileNotFoundException();
-            //System.out.println("A megadott fájl nem létezik: ".concat(source.getAbsolutePath()));
         }
 
         return destination;
