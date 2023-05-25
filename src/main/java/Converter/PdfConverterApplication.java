@@ -30,12 +30,19 @@ public class PdfConverterApplication extends Application {
 
         FileChooser fileChooser = new FileChooser();
 
+        //fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("html"));
+
         Text fileInfo = new Text(chooserPlaceholder);
 
         fileInfo.setDisable(true);
 
+        TextArea output = new TextArea();
+
+        output.setDisable(true);
+
         Button button = new Button("Select HTML File");
         button.setOnAction(e -> {
+            output.setText("Fájl betöltése.\r\n");
             if (previousDir != null) {
                 fileChooser.setInitialDirectory(previousDir);
             }
@@ -45,6 +52,8 @@ public class PdfConverterApplication extends Application {
 
             previousDir = selectedFile.getParentFile();
             fileInfo.setText(selectedFile.getAbsolutePath());
+
+            output.appendText("Fájl betöltve: ".concat(selectedFile.getAbsolutePath()).concat("\r\n"));
         });
 
         CheckBox waterMark = new CheckBox("Watermark");
@@ -59,6 +68,8 @@ public class PdfConverterApplication extends Application {
         Button convertButton = new Button("Convert");
 
         convertButton.setOnAction(e -> {
+            output.appendText("Konvertálás: ".concat(destination.getAbsolutePath()).concat("\r\n"));
+            
             HtmlToPdf converter = new HtmlToPdf(selectedFile, destination);
             try {
                 if (waterMark.isSelected() && waterMarkText.getText().length() > 0) {
@@ -98,13 +109,9 @@ public class PdfConverterApplication extends Application {
         gridPane.add(waterMark, 0, 1);
         gridPane.add(waterMarkText, 1, 1);
         gridPane.add(convertButton, 1, 2);
+        gridPane.add(output, 0, 3, 2,1);
 
-
-        TextArea output = new TextArea();
-
-        VBox vBox = new VBox();
-
-        vBox.setAlignment(Pos.CENTER);
+        GridPane.setColumnSpan(output, 3);
 
         Scene scene = new Scene(gridPane, 960, 600);
 
