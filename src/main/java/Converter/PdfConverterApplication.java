@@ -1,9 +1,10 @@
 package Converter;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Optional;
 
-import com.sun.javafx.scene.control.InputField;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -13,7 +14,6 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -30,14 +30,11 @@ public class PdfConverterApplication extends Application {
 
         FileChooser fileChooser = new FileChooser();
 
-        //fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("html"));
-
         Text fileInfo = new Text(chooserPlaceholder);
 
         fileInfo.setDisable(true);
 
         TextArea output = new TextArea();
-
         output.setDisable(true);
 
         Button button = new Button("Select HTML File");
@@ -69,9 +66,11 @@ public class PdfConverterApplication extends Application {
 
         convertButton.setOnAction(e -> {
             output.appendText("Konvertálás: ".concat(destination.getAbsolutePath()).concat("\r\n"));
-            
-            HtmlToPdf converter = new HtmlToPdf(selectedFile, destination);
+
             try {
+
+                HtmlToPdf converter = new HtmlToPdf(selectedFile, destination);
+
                 if (waterMark.isSelected() && waterMarkText.getText().length() > 0) {
                     converter.setWatermark(waterMarkText.getText());
                 }

@@ -17,6 +17,7 @@ import com.itextpdf.styledxmlparser.css.media.MediaDeviceDescription;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 
 public class HtmlToPdf {
@@ -34,9 +35,18 @@ public class HtmlToPdf {
 
 
 
-    public HtmlToPdf(File source, File destination) {
+    public HtmlToPdf(File source, File destination) throws IOException, InvalidMimeTypeException {
         this.source      = source;
         this.destination = destination;
+
+        String mimeType = Files.probeContentType(source.toPath());
+
+        System.out.println(mimeType);
+        if (!source.exists()) {
+            throw new FileNotFoundException("File not found.");
+        }else if (!mimeType.equals("text/html")) {
+            throw new InvalidMimeTypeException("Accepted mime type: text/html.");
+        }
 
         this.baseURI = destination.getAbsolutePath().replace(source.getName(), "");
 
@@ -65,14 +75,6 @@ public class HtmlToPdf {
 
     public File convert() throws Exception {
         if (this.source.exists()) {
-            /*File jar = new File(System.getProperty("java.class.path"));
-            File dir = new File(jar.getParent().concat("/fonts"));
-
-            // Hát ez még kérdéses, hogy jó-e így :D
-            if( !dir.toString().contains(";") && dir.exists() ) {
-                fontProvider.addDirectory(dir.toPath().toString());
-            }*/
-
             properties.setBaseUri(this.baseURI);
             properties.setFontProvider(this.fontProvider);
 
@@ -115,7 +117,7 @@ public class HtmlToPdf {
                 System.gc();
             }
         } else {
-            throw new FileNotFoundException();
+            throw new IOException();
         }
 
         return destination;
