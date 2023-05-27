@@ -14,6 +14,9 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
 
+/**
+ * PDF állomány vízjelezésére létrehozott osztály
+ */
 public class Watermark {
     protected PdfDocument document;
     protected String watermark;
@@ -29,7 +32,7 @@ public class Watermark {
         Paragraph paragraph = new Paragraph(watermark).setFont(font).setFontSize(100).setRotationAngle(1).setWidth(500).setFixedPosition(155,475, 750);
         PdfExtGState gs1    = new PdfExtGState().setFillOpacity(0.5f);
 
-        // Implement transformation matrix usage in order to scale image
+        // Oldalankénti bejárás és vízjel elhelyezése
         for (int i = 1; i <= document.getNumberOfPages(); i++) {
             PdfPage   pdfPage  = document.getPage(i);
             Rectangle pageSize = pdfPage.getPageSize();

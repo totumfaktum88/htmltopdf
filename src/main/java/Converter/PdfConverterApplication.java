@@ -24,6 +24,9 @@ public class PdfConverterApplication extends Application {
     protected File destination = null;
     protected File previousDir = null;
 
+    /*
+     * Inputok és a hozzátartozó események inicializálása
+     */
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("iText HTML to PDF");
@@ -80,9 +83,12 @@ public class PdfConverterApplication extends Application {
                 converter.convert();
 
                 convertButton.setDisable(false);
+
+                output.appendText("Konvertálás kész.\r\n");
             } catch (Exception ex) {
-                ex.printStackTrace();
+
                 convertButton.setDisable(false);
+                output.appendText("Hiba: ".concat(ex.getMessage()).concat("\r\n"));
             }
         });
 

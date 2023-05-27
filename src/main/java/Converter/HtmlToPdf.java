@@ -20,6 +20,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 
+/**
+ * HTML-ből PDF állományt konvertáló osztály, amely az iText library-t  használja fel erre a célra.
+ */
 public class HtmlToPdf {
     protected PdfWriter writer;
     protected PdfDocument pdf;
@@ -39,6 +42,7 @@ public class HtmlToPdf {
         this.source      = source;
         this.destination = destination;
 
+        //Mime típus és fájl útvonal ellenőrzése
         String mimeType = Files.probeContentType(source.toPath());
 
         System.out.println(mimeType);
@@ -49,35 +53,50 @@ public class HtmlToPdf {
         }
 
         this.baseURI = destination.getAbsolutePath().replace(source.getName(), "");
-
-        this.fontProvider = new DefaultFontProvider(false, false, false);
-        this.properties   = new ConverterProperties().setBaseUri(".")
-                .setCreateAcroForm(false)
-                .setCssApplierFactory(new DefaultCssApplierFactory())
-                .setFontProvider(new DefaultFontProvider())
-                .setMediaDeviceDescription(MediaDeviceDescription.createDefault())
-                .setOutlineHandler(new OutlineHandler())
-                .setTagWorkerFactory(new DefaultTagWorkerFactory());
-
-        fontProvider.addSystemFonts();
-        fontProvider.addStandardPdfFonts();
     }
 
+    /**
+     * Watermark beállítása
+     * @param text
+     */
     public void setWatermark(String text) {
         this.watermark = text;
     }
 
+    /**
+     * Font mappa hozzáadása a Font Providerhez, ha szükséges
+     * @param dir
+     */
     public void addFontDirectory(File dir) {
         if( dir.exists() && dir.isDirectory() && dir.listFiles().length > 0 ) {
             fontProvider.addDirectory(dir.toPath().toString());
         }
     }
 
+    /**
+     * Konverzió indítása a megadott forrás fájl alapján
+     * @return File
+     * @throws Exception
+     */
     public File convert() throws Exception {
         if (this.source.exists()) {
+            // Fontok inicializálása
+            this.fontProvider = new DefaultFontProvider(false, false, false);
+            this.properties   = new ConverterProperties().setBaseUri(".")
+                    .setCreateAcroForm(false)
+                    .setCssApplierFactory(new DefaultCssApplierFactory())
+                    .setFontProvider(new DefaultFontProvider())
+                    .setMediaDeviceDescription(MediaDeviceDescription.createDefault())
+                    .setOutlineHandler(new OutlineHandler())
+                    .setTagWorkerFactory(new DefaultTagWorkerFactory());
+
+            fontProvider.addSystemFonts();
+            fontProvider.addStandardPdfFonts();
+
             properties.setBaseUri(this.baseURI);
             properties.setFontProvider(this.fontProvider);
 
+            //Konverzió indítása
             this.writer = new PdfWriter(this.destination);
             this.pdf    = new PdfDocument(this.writer);
             this.doc    = HtmlConverter.convertToDocument(
@@ -91,6 +110,9 @@ public class HtmlToPdf {
 
             System.gc();
 
+            // Ha van megadva vízjel, létrehozunk egy vízjeles verziót is.
+            // Mivel a cél fájl használatban van ezért kell egy külön fájl, ahova tárolásra kerül a vízjelezett verzió.
+            // Ha végzett a folyamat, az eredeti fájl törlésre kerül, a vízjelezett meg a célfájl nevére lesz átnevezve.
             if( this.watermark != null && this.watermark.length() > 0 ) {
                 File watermarked = new File(destination.getParent().toString().concat("/"+destination.getName().replace(".pdf","-watermark.pdf")));
 
@@ -115,6 +137,8 @@ public class HtmlToPdf {
                 signerReader.close();
 
                 System.gc();
+                destination.delete();
+                watermarked.renameTo(destination);
             }
         } else {
             throw new IOException();
